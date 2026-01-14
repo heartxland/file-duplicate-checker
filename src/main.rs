@@ -33,3 +33,21 @@ fn main() {
         }
     }
 }
+
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_size_map_logic() {
+        let mut size_map: HashMap<u64, Vec<PathBuf>> = HashMap::new();
+        let size = 1024;
+        let path = PathBuf::from("test.txt");
+
+        // ロジックのシミュレーション
+        size_map.entry(size).or_insert(Vec::new()).push(path.clone());
+
+        assert!(size_map.contains_key(&size));
+        assert_eq!(size_map.get(&size).unwrap().len(), 1);
+        assert_eq!(size_map.get(&size).unwrap()[0], path);
+    }
+}
