@@ -1,9 +1,8 @@
+use sha2::digest::crypto_common::IvSizeUser;
 use std::collections::HashMap;
 use std::fs::{self, Metadata};
 use std::path::PathBuf;
-use sha2::digest::crypto_common::IvSizeUser;
 use walkdir::WalkDir;
-
 
 fn main() {
     let target_dir = "./";
@@ -16,9 +15,12 @@ fn main() {
         let path = entry.path();
 
         if path.is_file() {
-            if let Ok(metadata) = fs::metadata(path){
+            if let Ok(metadata) = fs::metadata(path) {
                 let size = metadata.len();
-                size_map.entry(size).or_insert(Vec::new()).push(path.to_path_buf());
+                size_map
+                    .entry(size)
+                    .or_insert(Vec::new())
+                    .push(path.to_path_buf());
             }
         }
     }
@@ -44,7 +46,10 @@ mod tests {
         let path = PathBuf::from("test.txt");
 
         // ロジックのシミュレーション
-        size_map.entry(size).or_insert(Vec::new()).push(path.clone());
+        size_map
+            .entry(size)
+            .or_insert(Vec::new())
+            .push(path.clone());
 
         assert!(size_map.contains_key(&size));
         assert_eq!(size_map.get(&size).unwrap().len(), 1);
