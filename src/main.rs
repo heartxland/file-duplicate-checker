@@ -1,6 +1,4 @@
-use sha2::digest::crypto_common::IvSizeUser;
 use std::collections::HashMap;
-use std::fs::{self, Metadata};
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
@@ -11,17 +9,15 @@ fn main() {
 
     println!("Scanning directory: {}...", target_dir);
 
-    for entry in WalkDir::new(target_dir).into_iter().filter_map(|e| e.ok()) {
+    for entry in WalkDir::new(target_dir)
+        .into_iter()
+        .filter_map(|e| e.ok())
+        .filter(|e| e.file_type().is_file())
+    {
         let path = entry.path();
-
-        if path.is_file() {
-            if let Ok(metadata) = fs::metadata(path) {
-                let size = metadata.len();
-                size_map
-                    .entry(size)
-                    .or_insert(Vec::new())
-                    .push(path.to_path_buf());
-            }
+        if let Ok(metadata) = entry.metadata() {
+            let size = metadata.len();
+            size_map.entry(size).or_default().push(path.to_path_buf());
         }
     }
 
@@ -36,6 +32,7 @@ fn main() {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::*;
 
